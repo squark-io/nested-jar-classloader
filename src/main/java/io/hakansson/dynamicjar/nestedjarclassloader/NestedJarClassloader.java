@@ -87,13 +87,13 @@ public class NestedJarClassloader extends ClassLoader {
             while ((len = jarInputStream.read(b)) > 0) {
                 out.write(b, 0, len);
             }
-            String path;
+            String spec;
             if (url.getProtocol().equals("jar")) {
-                path = url.getPath();
+                spec = url.getPath();
             } else {
-                path = url.getProtocol() + ":" + url.getPath();
+                spec = url.getProtocol() + ":" + url.getPath();
             }
-            URL contentUrl = new URL(null, "jar:" + path + "!/" + jarEntry.getName(),
+            URL contentUrl = new URL(null, "jar:" + spec + "!/" + jarEntry.getName(),
                 new NestedJarURLStreamHandler());
             jarContents.put(jarEntry.getName(), contentUrl);
             if (jarEntry.getName().endsWith(".jar")) {
