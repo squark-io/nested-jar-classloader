@@ -33,9 +33,8 @@ import java.util.jar.JarInputStream;
  */
 public class NestedJarClassloader extends ClassLoader {
 
-    private Map<String, URL> jarResources = new HashMap<>();
-    private MultiValuedMap<String, URL> jarContents = MultiMapUtils.newListValuedHashMap();
-    private Map<String, Class> loadedClasses = new HashMap<>();
+    private final Map<String, URL> jarResources = new HashMap<>();
+    private final MultiValuedMap<String, URL> jarContents = MultiMapUtils.newListValuedHashMap();
     private Logger logger = LoggerFactory.getLogger(NestedJarClassloader.class);
 
     public NestedJarClassloader(URL[] urls, ClassLoader parent) {
@@ -49,60 +48,65 @@ public class NestedJarClassloader extends ClassLoader {
         }
     }
 
-    public void addURL(URL url) {
-        if (!jarResources.containsKey(url.getPath())) {
-            jarResources.put(url.getPath(), url);
-            try {
-                addJar(url);
-            } catch (IOException e) {
-                logger.error(Marker.ANY_MARKER, e);
-                throw new RuntimeException(e);
+    public synchronized void addURL(URL url) {
+        synchronized (jarResources) {
+            if (!jarResources.containsKey(url.getPath())) {
+                jarResources.put(url.getPath(), url);
+                try {
+                    addJar(url);
+                } catch (IOException e) {
+                    logger.error(Marker.ANY_MARKER, e);
+                    throw new RuntimeException(e);
+                }
+            } else {
+                logger.warn("Already added " + url.getFile());
             }
-        } else {
-            logger.warn("Already added " + url.getFile());
         }
     }
 
-    private void addJar(URL url) throws IOException {
-        logger.trace("Adding url " + url.getPath());
-        BufferedInputStream bufferedInputStream = new BufferedInputStream(url.openStream());
-        JarInputStream jarInputStream = new JarInputStream(bufferedInputStream);
-        JarEntry jarEntry;
-        while ((jarEntry = jarInputStream.getNextJarEntry()) != null) {
-            if (jarEntry.isDirectory()) {
-                continue;
-            }
-            if (jarContents.containsKey(jarEntry.getName())) {
-                logger.trace("Already have resource " + jarEntry.getName() +
-                             ". If different versions, unexpected behaviour might occur. " +
-                             "Available" +
-                             " in " +
-                             jarContents.get(jarEntry.getName()));
-            }
+    private synchronized void addJar(URL url) throws IOException {
+        synchronized (jarContents) {
+            logger.trace("Adding url " + url.getPath());
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(url.openStream());
+            JarInputStream jarInputStream = new JarInputStream(bufferedInputStream);
+            JarEntry jarEntry;
 
-            byte[] b = new byte[2048];
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            while ((jarEntry = jarInputStream.getNextJarEntry()) != null) {
+                if (jarEntry.isDirectory()) {
+                    continue;
+                }
+                if (jarContents.containsKey(jarEntry.getName())) {
+                    logger.trace("Already have resource " + jarEntry.getName() +
+                                 ". If different versions, unexpected behaviour might occur. " +
+                                 "Available" +
+                                 " in " +
+                                 jarContents.get(jarEntry.getName()));
+                }
 
-            int len = 0;
-            while ((len = jarInputStream.read(b)) > 0) {
-                out.write(b, 0, len);
+                byte[] b = new byte[2048];
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+                int len = 0;
+                while ((len = jarInputStream.read(b)) > 0) {
+                    out.write(b, 0, len);
+                }
+                String spec;
+                if (url.getProtocol().equals("jar")) {
+                    spec = url.getPath();
+                } else {
+                    spec = url.getProtocol() + ":" + url.getPath();
+                }
+                URL contentUrl = new URL(null, "jar:" + spec + "!/" + jarEntry.getName(),
+                    new NestedJarURLStreamHandler());
+                jarContents.put(jarEntry.getName(), contentUrl);
+                if (jarEntry.getName().endsWith(".jar")) {
+                    addJar(contentUrl);
+                }
+                out.close();
             }
-            String spec;
-            if (url.getProtocol().equals("jar")) {
-                spec = url.getPath();
-            } else {
-                spec = url.getProtocol() + ":" + url.getPath();
-            }
-            URL contentUrl = new URL(null, "jar:" + spec + "!/" + jarEntry.getName(),
-                new NestedJarURLStreamHandler());
-            jarContents.put(jarEntry.getName(), contentUrl);
-            if (jarEntry.getName().endsWith(".jar")) {
-                addJar(contentUrl);
-            }
-            out.close();
+            jarInputStream.close();
+            bufferedInputStream.close();
         }
-        jarInputStream.close();
-        bufferedInputStream.close();
     }
 
     @Override
@@ -132,9 +136,11 @@ public class NestedJarClassloader extends ClassLoader {
     @Override
     public URL findResource(String name) {
         try {
-            Enumeration<URL> urls = findResources(name);
-            if (urls.hasMoreElements()) {
-                return urls.nextElement();
+            synchronized (jarContents) {
+                Enumeration<URL> urls = findResources(name);
+                if (urls.hasMoreElements()) {
+                    return urls.nextElement();
+                }
             }
         } catch (IOException e) {
             // Do nothing
@@ -144,10 +150,12 @@ public class NestedJarClassloader extends ClassLoader {
 
     @Override
     public Enumeration<URL> findResources(String name) throws IOException {
-        if (jarContents.containsKey(name)) {
-            return Collections.enumeration(jarContents.get(name));
+        synchronized (jarContents) {
+            if (jarContents.containsKey(name)) {
+                return Collections.enumeration(jarContents.get(name));
+            }
+            return Collections.emptyEnumeration();
         }
-        return Collections.emptyEnumeration();
     }
 
     private void definePackageForClass(String className) {
