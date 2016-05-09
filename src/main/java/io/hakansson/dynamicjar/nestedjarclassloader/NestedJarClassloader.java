@@ -7,11 +7,10 @@ package io.hakansson.dynamicjar.nestedjarclassloader;
  * Copyright 2016
  */
 
+import io.hakansson.dynamicjar.logging.api.InternalLogger;
+import io.hakansson.dynamicjar.logging.api.LogLevel;
 import org.apache.commons.collections4.MultiMapUtils;
 import org.apache.commons.collections4.MultiValuedMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -31,13 +30,13 @@ import java.util.jar.JarInputStream;
  * Created by Erik Håkansson on 2016-04-11.
  * Copyright 2016
  */
-public class NestedJarClassloader extends ClassLoader {
+public class NestedJarClassLoader extends ClassLoader {
 
     private final Map<String, URL> jarResources = new HashMap<>();
     private final MultiValuedMap<String, URL> jarContents = MultiMapUtils.newListValuedHashMap();
-    private Logger logger = LoggerFactory.getLogger(NestedJarClassloader.class);
+    private InternalLogger logger = InternalLogger.getLogger(NestedJarClassLoader.class);
 
-    public NestedJarClassloader(URL[] urls, ClassLoader parent) {
+    public NestedJarClassLoader(URL[] urls, ClassLoader parent) {
         super(parent);
         addURLs(urls);
     }
@@ -55,18 +54,18 @@ public class NestedJarClassloader extends ClassLoader {
                 try {
                     addJar(url);
                 } catch (IOException e) {
-                    logger.error(Marker.ANY_MARKER, e);
+                    logger.log(LogLevel.ERROR, e);
                     throw new RuntimeException(e);
                 }
             } else {
-                logger.warn("Already added " + url.getFile());
+                logger.log(LogLevel.WARN, "Already added " + url.getFile());
             }
         }
     }
 
     private synchronized void addJar(URL url) throws IOException {
         synchronized (jarContents) {
-            logger.trace("Adding url " + url.getPath());
+            logger.log(LogLevel.TRACE, "Adding url " + url.getPath());
             BufferedInputStream bufferedInputStream = new BufferedInputStream(url.openStream());
             JarInputStream jarInputStream = new JarInputStream(bufferedInputStream);
             JarEntry jarEntry;
@@ -76,11 +75,11 @@ public class NestedJarClassloader extends ClassLoader {
                     continue;
                 }
                 if (jarContents.containsKey(jarEntry.getName())) {
-                    logger.trace("Already have resource " + jarEntry.getName() +
-                                 ". If different versions, unexpected behaviour might occur. " +
-                                 "Available" +
-                                 " in " +
-                                 jarContents.get(jarEntry.getName()));
+                    logger.log(LogLevel.TRACE, "Already have resource " + jarEntry.getName() +
+                        ". If different versions, unexpected behaviour might occur. " +
+                        "Available" +
+                        " in " +
+                        jarContents.get(jarEntry.getName()));
                 }
 
                 byte[] b = new byte[2048];
@@ -96,8 +95,8 @@ public class NestedJarClassloader extends ClassLoader {
                 } else {
                     spec = url.getProtocol() + ":" + url.getPath();
                 }
-                URL contentUrl = new URL(null, "jar:" + spec + "!/" + jarEntry.getName(),
-                    new NestedJarURLStreamHandler());
+                URL contentUrl =
+                    new URL(null, "jar:" + spec + "!/" + jarEntry.getName(), new NestedJarURLStreamHandler());
                 jarContents.put(jarEntry.getName(), contentUrl);
                 if (jarEntry.getName().endsWith(".jar")) {
                     addJar(contentUrl);

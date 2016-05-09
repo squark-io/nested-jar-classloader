@@ -13,10 +13,13 @@
     <artifactId>nested-jar-classloader</artifactId>
 
     <dependencies>
+        <!-- INTERNAL DEPENDENCIES -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
+            <groupId>io.hakansson.dynamicjar</groupId>
+            <artifactId>dynamicjar-logging-api</artifactId>
         </dependency>
+
+        <!-- EXTERNAL DEPENDENCIES -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>

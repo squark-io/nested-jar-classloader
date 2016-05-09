@@ -30,7 +30,6 @@ public class NestedJarURLConnection extends URLConnection implements AutoCloseab
     private byte[] entryBytes;
     private byte[] subEntryBytes;
 
-
     /**
      * Constructs a URL connection to the specified URL. A connection to
      * the object referenced by the URL is not created.
