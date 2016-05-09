@@ -51,15 +51,38 @@ public class NestedJarClassLoader extends ClassLoader {
         synchronized (jarResources) {
             if (!jarResources.containsKey(url.getPath())) {
                 jarResources.put(url.getPath(), url);
-                try {
-                    addJar(url);
-                } catch (IOException e) {
-                    logger.log(LogLevel.ERROR, e);
-                    throw new RuntimeException(e);
+                if (url.getPath().endsWith(".jar")) {
+                    try {
+                        addJar(url);
+                    } catch (IOException e) {
+                        logger.log(LogLevel.ERROR, e);
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    addResource(url);
                 }
             } else {
                 logger.log(LogLevel.WARN, "Already added " + url.getFile());
             }
+        }
+    }
+
+    private synchronized void addResource(URL url) {
+        synchronized (jarContents) {
+            logger.log(LogLevel.TRACE, "Adding url " + url.getPath());
+            String contentName;
+            if (url.getProtocol().equals("jar")) {
+                int li = url.getPath().lastIndexOf("!/");
+                contentName = url.getPath().substring(li + 2);
+            } else {
+                contentName = url.getPath();
+            }
+            if (jarContents.containsKey(contentName)) {
+                logger.log(LogLevel.TRACE, "Already have resource " + contentName +
+                                           ". If different versions, unexpected behaviour might " +
+                                           "occur. Available in " + jarContents.get(contentName));
+            }
+            jarContents.put(contentName, url);
         }
     }
 
@@ -76,10 +99,9 @@ public class NestedJarClassLoader extends ClassLoader {
                 }
                 if (jarContents.containsKey(jarEntry.getName())) {
                     logger.log(LogLevel.TRACE, "Already have resource " + jarEntry.getName() +
-                        ". If different versions, unexpected behaviour might occur. " +
-                        "Available" +
-                        " in " +
-                        jarContents.get(jarEntry.getName()));
+                                               ". If different versions, unexpected behaviour " +
+                                               "might occur. Available in " +
+                                               jarContents.get(jarEntry.getName()));
                 }
 
                 byte[] b = new byte[2048];
@@ -95,8 +117,8 @@ public class NestedJarClassLoader extends ClassLoader {
                 } else {
                     spec = url.getProtocol() + ":" + url.getPath();
                 }
-                URL contentUrl =
-                    new URL(null, "jar:" + spec + "!/" + jarEntry.getName(), new NestedJarURLStreamHandler());
+                URL contentUrl = new URL(null, "jar:" + spec + "!/" + jarEntry.getName(),
+                    new NestedJarURLStreamHandler());
                 jarContents.put(jarEntry.getName(), contentUrl);
                 if (jarEntry.getName().endsWith(".jar")) {
                     addJar(contentUrl);
@@ -123,7 +145,8 @@ public class NestedJarClassLoader extends ClassLoader {
                 byteArrayOutputStream.close();
                 byte[] classBytes = byteArrayOutputStream.toByteArray();
                 definePackageForClass(name);
-                return defineClass(name, classBytes, 0, classBytes.length);
+                return defineClass(name, classBytes, 0, classBytes.length,
+                    this.getClass().getProtectionDomain());
             } catch (IOException e) {
                 throw new ClassNotFoundException(name, e);
             }
