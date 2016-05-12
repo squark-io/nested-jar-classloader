@@ -78,7 +78,7 @@ public class NestedJarClassLoader extends ClassLoader {
                 contentName = url.getPath();
             }
             if (jarContents.containsKey(contentName)) {
-                logger.log(LogLevel.DEBUG, "Already have resource " + contentName +
+                logger.log(LogLevel.TRACE, "Already have resource " + contentName +
                     ". If different versions, unexpected behaviour might " +
                     "occur. Available in " + jarContents.get(contentName));
             }
@@ -99,7 +99,7 @@ public class NestedJarClassLoader extends ClassLoader {
                     continue;
                 }
                 if (jarContents.containsKey(jarEntry.getName())) {
-                    logger.log(LogLevel.DEBUG, "Already have resource " + jarEntry.getName() +
+                    logger.log(LogLevel.TRACE, "Already have resource " + jarEntry.getName() +
                         ". If different versions, unexpected behaviour " +
                         "might occur. Available in " +
                         jarContents.get(jarEntry.getName()));
