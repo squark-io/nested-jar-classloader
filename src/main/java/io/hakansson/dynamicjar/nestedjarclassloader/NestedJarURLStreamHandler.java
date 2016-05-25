@@ -18,7 +18,7 @@ public class NestedJarURLStreamHandler extends URLStreamHandler {
     @Override
     protected URLConnection openConnection(URL url) throws IOException {
         if (nestedJarURLConnection == null) {
-            nestedJarURLConnection = new NestedJarURLConnection(url);
+            nestedJarURLConnection = new NestedJarURLConnection(url, true);
         }
         return nestedJarURLConnection;
     }

@@ -35,9 +35,12 @@ public class NestedJarURLConnection extends URLConnection implements AutoCloseab
      *
      * @param url the specified URL.
      */
-    public NestedJarURLConnection(URL url) throws MalformedURLException {
+    public NestedJarURLConnection(URL url, boolean connect) throws IOException {
         super(url);
         parseSpecs(url);
+        if (connect) {
+            connect();
+        }
     }
 
     /**
@@ -81,7 +84,7 @@ public class NestedJarURLConnection extends URLConnection implements AutoCloseab
             }
 
             is.close();
-            if (subEntryName != null && entryOutputStream != null) {
+            if (subEntryName != null) {
                 JarInputStream entryInputStream =
                     new JarInputStream(entryOutputStream.asByteSource().openBufferedStream());
                 JarEntry subEntry;
@@ -100,8 +103,6 @@ public class NestedJarURLConnection extends URLConnection implements AutoCloseab
                 entryOutputStream.reset();
                 entryOutputStream.close();
                 entryOutputStream = null;
-            } else if (subEntryName != null) {
-                throw new IllegalStateException("EntryOutputStream should not be null!");
             }
         }
         connected = true;
@@ -130,7 +131,7 @@ public class NestedJarURLConnection extends URLConnection implements AutoCloseab
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws IOException {
         if (this.subEntryOutputStream != null) {
             this.subEntryOutputStream.reset();
             this.subEntryOutputStream.close();

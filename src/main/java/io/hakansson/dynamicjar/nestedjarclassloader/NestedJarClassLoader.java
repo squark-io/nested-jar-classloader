@@ -17,6 +17,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -34,10 +35,17 @@ public class NestedJarClassLoader extends ClassLoader {
 
     private final Map<String, URL> jarResources = new HashMap<>();
     private final MultiValuedMap<String, URL> jarContents = MultiMapUtils.newListValuedHashMap();
+    private final boolean eagerByteCaching;
     private InternalLogger logger = InternalLogger.getLogger(NestedJarClassLoader.class);
+    private Map<String, byte[]> cachedClassBytes = new HashMap<>();
 
     public NestedJarClassLoader(URL[] urls, ClassLoader parent) {
+        this(urls, parent, false);
+    }
+
+    public NestedJarClassLoader(URL[] urls, ClassLoader parent, boolean eagerByteCaching) {
         super(parent);
+        this.eagerByteCaching = eagerByteCaching;
         addURLs(urls);
     }
 
@@ -78,8 +86,8 @@ public class NestedJarClassLoader extends ClassLoader {
                 contentName = url.getPath();
             }
             if (jarContents.containsKey(contentName)) {
-                logger.log(LogLevel.TRACE, "Already have resource " + contentName +
-                    ". If different versions, unexpected behaviour might " +
+                logger.log(LogLevel.TRACE,
+                    "Already have resource " + contentName + ". If different versions, unexpected behaviour might " +
                     "occur. Available in " + jarContents.get(contentName));
             }
             jarContents.put(contentName, url);
@@ -100,18 +108,10 @@ public class NestedJarClassLoader extends ClassLoader {
                 }
                 if (jarContents.containsKey(jarEntry.getName())) {
                     logger.log(LogLevel.TRACE, "Already have resource " + jarEntry.getName() +
-                        ". If different versions, unexpected behaviour " +
-                        "might occur. Available in " +
-                        jarContents.get(jarEntry.getName()));
+                                               ". If different versions, unexpected behaviour " +
+                                               "might occur. Available in " + jarContents.get(jarEntry.getName()));
                 }
 
-                byte[] b = new byte[2048];
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-                int len;
-                while ((len = jarInputStream.read(b)) > 0) {
-                    out.write(b, 0, len);
-                }
                 String spec;
                 if (url.getProtocol().equals("jar")) {
                     spec = url.getPath();
@@ -121,11 +121,21 @@ public class NestedJarClassLoader extends ClassLoader {
                 URL contentUrl =
                     new URL(null, "jar:" + spec + "!/" + jarEntry.getName(), new NestedJarURLStreamHandler());
                 jarContents.put(jarEntry.getName(), contentUrl);
+                if (eagerByteCaching && jarEntry.getName().endsWith(".class")) {
+                    int len;
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    byte[] b = new byte[2048];
+
+                    while ((len = jarInputStream.read(b)) > 0) {
+                        out.write(b, 0, len);
+                    }
+                    out.close();
+                    cachedClassBytes.put(jarEntry.getName(), out.toByteArray());
+                }
                 logger.log(LogLevel.TRACE, "Added resource " + jarEntry.getName() + " to ClassLoader");
                 if (jarEntry.getName().endsWith(".jar")) {
                     addJar(contentUrl);
                 }
-                out.close();
             }
             jarInputStream.close();
             bufferedInputStream.close();
@@ -135,15 +145,26 @@ public class NestedJarClassLoader extends ClassLoader {
 
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
-        URL resourceURL = getResource(name.replace(".", "/") + ".class");
+        String replacedName = name.replace(".", "/") + ".class";
+        if (eagerByteCaching && cachedClassBytes.containsKey(replacedName)) {
+            definePackageForClass(name);
+            byte[] classBytes = cachedClassBytes.get(replacedName);
+            return defineClass(name, classBytes, 0, classBytes.length, this.getClass().getProtectionDomain());
+        }
+        URL resourceURL = getResource(replacedName);
         if (resourceURL != null) {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             int len;
             byte[] b = new byte[2048];
             try {
-                InputStream inputStream = resourceURL.openStream();
+                URLConnection urlConnection = resourceURL.openConnection();
+                InputStream inputStream = urlConnection.getInputStream();
                 while ((len = inputStream.read(b)) > 0) {
                     byteArrayOutputStream.write(b, 0, len);
+                }
+                inputStream.close();
+                if (urlConnection instanceof NestedJarURLConnection) {
+                    ((NestedJarURLConnection) urlConnection).close();
                 }
                 byteArrayOutputStream.close();
                 byte[] classBytes = byteArrayOutputStream.toByteArray();
