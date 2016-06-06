@@ -52,6 +52,10 @@ public class NestedJarURLConnection extends URLConnection implements AutoCloseab
     private void parseSpecs(URL url) throws MalformedURLException {
         String spec = url.getFile();
 
+        if (spec.startsWith("jar:")) {
+            spec = spec.substring(4, spec.length());
+        }
+
         int separator = spec.indexOf("!/");
 
         jarFileURL = new URL(spec.substring(0, separator++));
