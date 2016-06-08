@@ -7,10 +7,10 @@ package io.hakansson.dynamicjar.nestedjarclassloader;
  * Copyright 2016
  */
 
-import io.hakansson.dynamicjar.logging.api.InternalLogger;
-import io.hakansson.dynamicjar.logging.api.LogLevel;
+import io.hakansson.dynamicjar.logging.api.InternalLoggerBinder;
 import org.apache.commons.collections4.MultiMapUtils;
 import org.apache.commons.collections4.MultiValuedMap;
+import org.slf4j.Logger;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -36,7 +36,7 @@ public class NestedJarClassLoader extends ClassLoader {
     private final Map<String, URL> jarResources = new HashMap<>();
     private final MultiValuedMap<String, URL> jarContents = MultiMapUtils.newListValuedHashMap();
     private final boolean eagerByteCaching;
-    private InternalLogger logger = InternalLogger.getLogger(NestedJarClassLoader.class);
+    private Logger logger = InternalLoggerBinder.getLogger(NestedJarClassLoader.class);
     private Map<String, byte[]> cachedClassBytes = new HashMap<>();
 
     public NestedJarClassLoader(URL[] urls, ClassLoader parent) {
@@ -63,21 +63,21 @@ public class NestedJarClassLoader extends ClassLoader {
                     try {
                         addJar(url);
                     } catch (IOException e) {
-                        logger.log(LogLevel.ERROR, e);
+                        logger.error(null, e);
                         throw new RuntimeException(e);
                     }
                 } else {
                     addResource(url);
                 }
             } else {
-                logger.log(LogLevel.WARN, "Already added " + url.getFile());
+                logger.warn("Already added " + url.getFile());
             }
         }
     }
 
     private synchronized void addResource(URL url) {
         synchronized (jarContents) {
-            logger.log(LogLevel.DEBUG, "Adding url " + url.getPath());
+            logger.debug("Adding url " + url.getPath());
             String contentName;
             if (url.getProtocol().equals("jar")) {
                 int li = url.getPath().lastIndexOf("!/");
@@ -86,9 +86,9 @@ public class NestedJarClassLoader extends ClassLoader {
                 contentName = url.getPath();
             }
             if (jarContents.containsKey(contentName)) {
-                logger.log(LogLevel.TRACE,
-                    "Already have resource " + contentName + ". If different versions, unexpected behaviour might " +
-                    "occur. Available in " + jarContents.get(contentName));
+                logger.trace(
+                        "Already have resource " + contentName + ". If different versions, unexpected behaviour might " + "occur. Available in " + jarContents.get(
+                                contentName));
             }
             jarContents.put(contentName, url);
         }
@@ -96,7 +96,7 @@ public class NestedJarClassLoader extends ClassLoader {
 
     private synchronized void addJar(URL url) throws IOException {
         synchronized (jarContents) {
-            logger.log(LogLevel.DEBUG, "Adding jar " + url.getPath());
+            logger.debug("Adding jar " + url.getPath());
             InputStream urlStream = url.openStream();
             BufferedInputStream bufferedInputStream = new BufferedInputStream(urlStream);
             JarInputStream jarInputStream = new JarInputStream(bufferedInputStream);
@@ -107,9 +107,9 @@ public class NestedJarClassLoader extends ClassLoader {
                     continue;
                 }
                 if (jarContents.containsKey(jarEntry.getName())) {
-                    logger.log(LogLevel.TRACE, "Already have resource " + jarEntry.getName() +
-                                               ". If different versions, unexpected behaviour " +
-                                               "might occur. Available in " + jarContents.get(jarEntry.getName()));
+                    logger.trace(
+                            "Already have resource " + jarEntry.getName() + ". If different versions, unexpected behaviour " + "might occur. Available in " + jarContents.get(
+                                    jarEntry.getName()));
                 }
 
                 String spec;
@@ -118,8 +118,7 @@ public class NestedJarClassLoader extends ClassLoader {
                 } else {
                     spec = url.getProtocol() + ":" + url.getPath();
                 }
-                URL contentUrl =
-                    new URL(null, "jar:" + spec + "!/" + jarEntry.getName(), new NestedJarURLStreamHandler());
+                URL contentUrl = new URL(null, "jar:" + spec + "!/" + jarEntry.getName(), new NestedJarURLStreamHandler());
                 jarContents.put(jarEntry.getName(), contentUrl);
                 if (eagerByteCaching && jarEntry.getName().endsWith(".class")) {
                     int len;
@@ -132,7 +131,7 @@ public class NestedJarClassLoader extends ClassLoader {
                     out.close();
                     cachedClassBytes.put(jarEntry.getName(), out.toByteArray());
                 }
-                logger.log(LogLevel.TRACE, "Added resource " + jarEntry.getName() + " to ClassLoader");
+                logger.trace("Added resource " + jarEntry.getName() + " to ClassLoader");
                 if (jarEntry.getName().endsWith(".jar")) {
                     addJar(contentUrl);
                 }
