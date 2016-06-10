@@ -50,6 +50,9 @@ public class NestedJarClassLoader extends ClassLoader {
     }
 
     public void addURLs(URL[] urls) {
+        if (urls == null) {
+            return;
+        }
         for (URL url : urls) {
             addURL(url);
         }
@@ -86,9 +89,8 @@ public class NestedJarClassLoader extends ClassLoader {
                 contentName = url.getPath();
             }
             if (jarContents.containsKey(contentName)) {
-                logger.trace(
-                        "Already have resource " + contentName + ". If different versions, unexpected behaviour might " + "occur. Available in " + jarContents.get(
-                                contentName));
+                logger.trace("Already have resource " + contentName + ". If different versions, unexpected behaviour might " +
+                        "occur. Available in " + jarContents.get(contentName));
             }
             jarContents.put(contentName, url);
         }
@@ -108,8 +110,8 @@ public class NestedJarClassLoader extends ClassLoader {
                 }
                 if (jarContents.containsKey(jarEntry.getName())) {
                     logger.trace(
-                            "Already have resource " + jarEntry.getName() + ". If different versions, unexpected behaviour " + "might occur. Available in " + jarContents.get(
-                                    jarEntry.getName()));
+                            "Already have resource " + jarEntry.getName() + ". If different versions, unexpected behaviour " +
+                                    "might occur. Available in " + jarContents.get(jarEntry.getName()));
                 }
 
                 String spec;
