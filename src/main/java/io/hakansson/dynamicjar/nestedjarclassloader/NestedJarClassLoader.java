@@ -135,4 +135,11 @@ public class NestedJarClassLoader extends ClassLoader {
         }
         return null;
     }
+
+    public void unloadModule(String loggingModuleName) {
+        if (modules.containsKey(loggingModuleName)) {
+            Module unloaded = modules.remove(loggingModuleName);
+            unloaded.cleanUp();
+        }
+    }
 }

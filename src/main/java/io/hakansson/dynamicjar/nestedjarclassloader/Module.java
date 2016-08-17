@@ -165,18 +165,6 @@ class Module extends ClassLoader {
         }
     }
 
-    Set<URL> findLocalResources(String name) {
-        return resources.get(name);
-    }
-
-    Optional<URL> findLocalResource(String name) {
-        Set<URL> foundResources = findLocalResources(name);
-        if (foundResources.size() > 0) {
-            return Optional.of(foundResources.iterator().next());
-        }
-        return Optional.empty();
-    }
-
     public Class<?> findLocalClass(String className, boolean resolve) throws ClassNotFoundException {
         return getLoadedClass(className, resolve);
     }
@@ -223,5 +211,23 @@ class Module extends ClassLoader {
                 definePackage(pkgname, null, null, null, null, null, null, null);
             }
         }
+    }
+
+    Optional<URL> findLocalResource(String name) {
+        Set<URL> foundResources = findLocalResources(name);
+        if (foundResources.size() > 0) {
+            return Optional.of(foundResources.iterator().next());
+        }
+        return Optional.empty();
+    }
+
+    Set<URL> findLocalResources(String name) {
+        return resources.get(name);
+    }
+
+    public void cleanUp() {
+        resources.clear();
+        classes.clear();
+        byteCache.clear();
     }
 }
