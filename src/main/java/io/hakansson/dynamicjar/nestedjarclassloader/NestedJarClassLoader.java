@@ -61,7 +61,7 @@ public class NestedJarClassLoader extends ClassLoader {
     private Module getModule(String moduleName) throws IOException {
         Module module = modules.get(moduleName);
         if (module == null) {
-            module = new Module(this);
+            module = new Module(moduleName, this);
             modules.put(moduleName, module);
         }
         return module;
@@ -80,7 +80,11 @@ public class NestedJarClassLoader extends ClassLoader {
             found = findModuleClass(name, resolve);
         }
         if (found == null) {
-            found = super.loadClass(name, resolve);
+            try {
+                found = super.loadClass(name, resolve);
+            } catch (NullPointerException e) {
+                //Do nothing
+            }
         }
         if (found == null) {
             found = getSystemClassLoader().loadClass(name);
@@ -136,6 +140,7 @@ public class NestedJarClassLoader extends ClassLoader {
         return null;
     }
 
+    @SuppressWarnings("unused")
     public void unloadModule(String loggingModuleName) {
         if (modules.containsKey(loggingModuleName)) {
             Module unloaded = modules.remove(loggingModuleName);

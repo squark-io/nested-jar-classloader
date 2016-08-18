@@ -34,9 +34,11 @@ class Module extends ClassLoader {
     private final Map<String, byte[]> byteCache = new HashMap<>();
     private final Map<String, Class<?>> classes = new HashMap<>();
     private Logger logger = InternalLoggerBinder.getLogger(Module.class);
+    private String name;
 
-    Module(NestedJarClassLoader parent) throws IOException {
+    Module(String name, NestedJarClassLoader parent) throws IOException {
         super(parent);
+        this.name = name;
     }
 
     public void addResources(URL... urls) throws IOException {
@@ -229,5 +231,10 @@ class Module extends ClassLoader {
         resources.clear();
         classes.clear();
         byteCache.clear();
+    }
+
+    @Override
+    public String toString() {
+        return "Module{" + "name='" + name + '\'' + '}';
     }
 }
