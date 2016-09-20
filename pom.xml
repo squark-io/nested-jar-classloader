@@ -15,7 +15,7 @@
     <dependencies>
         <!-- INTERNAL DEPENDENCIES -->
         <dependency>
-            <groupId>io.hakansson.dynamicjar</groupId>
+            <groupId>io.hakansson.dynamicjar.dynamicjar-logging</groupId>
             <artifactId>dynamicjar-logging-api</artifactId>
         </dependency>
 
