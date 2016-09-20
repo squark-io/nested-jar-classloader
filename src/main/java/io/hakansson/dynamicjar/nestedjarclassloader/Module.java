@@ -1,6 +1,6 @@
 package io.hakansson.dynamicjar.nestedjarclassloader;
 
-import io.hakansson.dynamicjar.logger.api.InternalLoggerBinder;
+import io.hakansson.dynamicjar.logging.api.InternalLoggerBinder;
 import org.apache.commons.collections4.MultiMapUtils;
 import org.apache.commons.collections4.SetValuedMap;
 import org.slf4j.Logger;
