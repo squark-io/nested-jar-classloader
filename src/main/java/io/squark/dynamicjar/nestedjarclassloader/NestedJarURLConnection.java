@@ -1,4 +1,4 @@
-package io.hakansson.dynamicjar.nestedjarclassloader;
+package io.squark.dynamicjar.nestedjarclassloader;
 
 import com.google.common.io.FileBackedOutputStream;
 import sun.net.www.ParseUtil;

@@ -1,4 +1,4 @@
-package io.hakansson.dynamicjar.nestedjarclassloader;
+package io.squark.dynamicjar.nestedjarclassloader;
 
 /*
   dynamicjar
@@ -70,7 +70,7 @@ public class NestedJarClassLoader extends ClassLoader {
     @Override
     public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         Class<?> found = null;
-        if (name.startsWith("io.hakansson.dynamicjar.nestedjarclassloader")) {
+        if (name.startsWith("io.squark.dynamicjar.nestedjarclassloader")) {
             found = super.loadClass(name, resolve);
         }
         if (name.startsWith("java.")) {

@@ -1,6 +1,6 @@
-package io.hakansson.dynamicjar.nestedjarclassloader;
+package io.squark.dynamicjar.nestedjarclassloader;
 
-import io.hakansson.dynamicjar.logging.api.InternalLoggerBinder;
+import io.squark.dynamicjar.logging.api.InternalLoggerBinder;
 import org.apache.commons.collections4.MultiMapUtils;
 import org.apache.commons.collections4.SetValuedMap;
 import org.slf4j.Logger;
@@ -155,7 +155,7 @@ class Module extends ClassLoader {
             if (found != null) {
                 return found;
             }
-            if (name.startsWith("io.hakansson.dynamicjar.nestedjarclassloader")) {
+            if (name.startsWith("io.squark.dynamicjar.nestedjarclassloader")) {
                 return ((NestedJarClassLoader) getParent()).loadClass(name, resolve);
             }
             found = findLocalClass(name, resolve);

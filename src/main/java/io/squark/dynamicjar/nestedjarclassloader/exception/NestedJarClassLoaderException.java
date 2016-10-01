@@ -1,4 +1,4 @@
-package io.hakansson.dynamicjar.nestedjarclassloader.exception;
+package io.squark.dynamicjar.nestedjarclassloader.exception;
 
 /**
  * dynamicjar

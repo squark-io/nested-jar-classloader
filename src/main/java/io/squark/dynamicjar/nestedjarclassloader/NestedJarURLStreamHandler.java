@@ -1,4 +1,4 @@
-package io.hakansson.dynamicjar.nestedjarclassloader;
+package io.squark.dynamicjar.nestedjarclassloader;
 
 import java.io.IOException;
 import java.net.URL;
