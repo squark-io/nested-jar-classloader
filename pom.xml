@@ -3,20 +3,20 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>dynamicjar</artifactId>
+        <artifactId>ask</artifactId>
         <groupId>io.squark</groupId>
         <version>0.0.2-ALPHA-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.squark.dynamicjar</groupId>
+    <groupId>io.squark.ask</groupId>
     <artifactId>nested-jar-classloader</artifactId>
 
     <dependencies>
         <!-- INTERNAL DEPENDENCIES -->
         <dependency>
-            <groupId>io.squark.dynamicjar.dynamicjar-logging</groupId>
-            <artifactId>dynamicjar-logging-api</artifactId>
+            <groupId>io.squark.ask.ask-logging</groupId>
+            <artifactId>ask-logging-api</artifactId>
         </dependency>
 
         <!-- EXTERNAL DEPENDENCIES -->

@@ -1,4 +1,4 @@
-package io.squark.dynamicjar.nestedjarclassloader;
+package io.squark.ask.nestedjarclassloader;
 
 import java.io.IOException;
 import java.net.URL;
@@ -6,7 +6,7 @@ import java.net.URLConnection;
 import java.net.URLStreamHandler;
 
 /**
- * dynamicjar
+ * ask
  * <p>
  * Created by Erik Håkansson on 2016-04-26.
  * Copyright 2016
