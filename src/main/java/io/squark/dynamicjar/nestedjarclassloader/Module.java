@@ -1,6 +1,6 @@
-package io.squark.ask.nestedjarclassloader;
+package io.squark.dynamicjar.nestedjarclassloader;
 
-import io.squark.ask.logging.api.InternalLoggerBinder;
+import io.squark.dynamicjar.logging.api.InternalLoggerBinder;
 import org.apache.commons.collections4.MultiMapUtils;
 import org.apache.commons.collections4.SetValuedMap;
 import org.slf4j.Logger;
@@ -23,7 +23,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
 /**
- * ask
+ * dynamicjar
  * <p>
  * Created by Erik Håkansson on 2016-06-21.
  * Copyright 2016
@@ -155,7 +155,7 @@ class Module extends ClassLoader {
             if (found != null) {
                 return found;
             }
-            if (name.startsWith("io.squark.ask.nestedjarclassloader")) {
+            if (name.startsWith("io.squark.dynamicjar.nestedjarclassloader")) {
                 return ((NestedJarClassLoader) getParent()).loadClass(name, resolve);
             }
             found = findLocalClass(name, resolve);

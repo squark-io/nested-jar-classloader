@@ -1,4 +1,4 @@
-package io.squark.ask.nestedjarclassloader;
+package io.squark.dynamicjar.nestedjarclassloader;
 
 import com.google.common.io.FileBackedOutputStream;
 import sun.net.www.ParseUtil;
@@ -14,7 +14,7 @@ import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 
 /**
- * ask
+ * dynamicjar
  * <p>
  * Created by Erik Håkansson on 2016-04-26.
  * Copyright 2016

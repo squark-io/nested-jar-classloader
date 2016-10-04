@@ -1,7 +1,7 @@
-package io.squark.ask.nestedjarclassloader.exception;
+package io.squark.dynamicjar.nestedjarclassloader.exception;
 
 /**
- * ask
+ * dynamicjar
  * <p>
  * Created by Erik Håkansson on 2016-06-23.
  * Copyright 2016

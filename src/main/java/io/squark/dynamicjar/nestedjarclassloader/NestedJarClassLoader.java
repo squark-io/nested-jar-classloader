@@ -1,7 +1,7 @@
-package io.squark.ask.nestedjarclassloader;
+package io.squark.dynamicjar.nestedjarclassloader;
 
 /*
-  ask
+  dynamicjar
   <p>
   Created by Erik Håkansson on 2016-04-11.
   Copyright 2016
@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * ask
+ * dynamicjar
  * <p>
  * Created by Erik Håkansson on 2016-04-11.
  * Copyright 2016
@@ -70,7 +70,7 @@ public class NestedJarClassLoader extends ClassLoader {
     @Override
     public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         Class<?> found = null;
-        if (name.startsWith("io.squark.ask.nestedjarclassloader")) {
+        if (name.startsWith("io.squark.dynamicjar.nestedjarclassloader")) {
             found = super.loadClass(name, resolve);
         }
         if (name.startsWith("java.")) {
