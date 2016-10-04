@@ -1,4 +1,4 @@
-package io.squark.dynamicjar.nestedjarclassloader;
+package io.squark.yggdrasil.nestedjarclassloader;
 
 import java.net.URL;
 import java.net.URLClassLoader;

@@ -1,4 +1,4 @@
-package io.squark.dynamicjar.nestedjarclassloader;
+package io.squark.yggdrasil.nestedjarclassloader;
 
 import com.google.common.io.FileBackedOutputStream;
 import sun.net.www.ParseUtil;
@@ -14,7 +14,7 @@ import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 
 /**
- * dynamicjar
+ * yggdrasil
  * <p>
  * Created by Erik Håkansson on 2016-04-26.
  * Copyright 2016

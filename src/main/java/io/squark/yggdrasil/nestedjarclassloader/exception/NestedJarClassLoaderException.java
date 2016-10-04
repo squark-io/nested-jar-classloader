@@ -1,7 +1,7 @@
-package io.squark.dynamicjar.nestedjarclassloader.exception;
+package io.squark.yggdrasil.nestedjarclassloader.exception;
 
 /**
- * dynamicjar
+ * yggdrasil
  * <p>
  * Created by Erik Håkansson on 2016-06-23.
  * Copyright 2016
