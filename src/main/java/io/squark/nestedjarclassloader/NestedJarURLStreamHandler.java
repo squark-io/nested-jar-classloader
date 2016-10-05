@@ -1,4 +1,4 @@
-package io.squark.yggdrasil.nestedjarclassloader;
+package io.squark.nestedjarclassloader;
 
 import java.io.IOException;
 import java.net.URL;

@@ -1,4 +1,4 @@
-package io.squark.yggdrasil.nestedjarclassloader;
+package io.squark.nestedjarclassloader;
 
 /*
   yggdrasil
@@ -70,7 +70,7 @@ public class NestedJarClassLoader extends ClassLoader {
     @Override
     public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         Class<?> found = null;
-        if (name.startsWith("io.squark.yggdrasil.nestedjarclassloader")) {
+        if (name.startsWith("io.squark.nestedjarclassloader")) {
             found = super.loadClass(name, resolve);
         }
         if (name.startsWith("java.")) {

@@ -1,4 +1,4 @@
-package io.squark.yggdrasil.nestedjarclassloader.exception;
+package io.squark.nestedjarclassloader.exception;
 
 /**
  * yggdrasil

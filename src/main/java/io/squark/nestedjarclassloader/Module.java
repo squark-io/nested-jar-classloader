@@ -1,4 +1,4 @@
-package io.squark.yggdrasil.nestedjarclassloader;
+package io.squark.nestedjarclassloader;
 
 import io.squark.yggdrasil.logging.api.InternalLoggerBinder;
 import org.apache.commons.collections4.MultiMapUtils;
@@ -155,7 +155,7 @@ class Module extends ClassLoader {
             if (found != null) {
                 return found;
             }
-            if (name.startsWith("io.squark.yggdrasil.nestedjarclassloader")) {
+            if (name.startsWith("io.squark.nestedjarclassloader")) {
                 return ((NestedJarClassLoader) getParent()).loadClass(name, resolve);
             }
             found = findLocalClass(name, resolve);

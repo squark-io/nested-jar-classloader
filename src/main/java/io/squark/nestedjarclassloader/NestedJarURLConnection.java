@@ -1,4 +1,4 @@
-package io.squark.yggdrasil.nestedjarclassloader;
+package io.squark.nestedjarclassloader;
 
 import com.google.common.io.FileBackedOutputStream;
 import sun.net.www.ParseUtil;
