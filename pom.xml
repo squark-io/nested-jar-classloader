@@ -12,6 +12,11 @@
     <groupId>io.squark.yggdrasil</groupId>
     <artifactId>nested-jar-classloader</artifactId>
 
+    <name>Nested Jar Classloader</name>
+    <description>
+        Classloader that handles "jar-in-jar" nested jars as well as module loading/unloading
+    </description>
+
     <dependencies>
         <!-- INTERNAL DEPENDENCIES -->
         <dependency>
