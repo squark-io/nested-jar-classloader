@@ -28,6 +28,9 @@ public class BootstrapClassLoader extends URLClassLoader {
         super(new URL[] {baseUrl}, null);
     }
 
+    public BootstrapClassLoader(URL[] baseUrls) throws Exception {
+        super(baseUrls, null);
+    }
 
     @SuppressWarnings("unused")
     public void addURLs(URL[] urls) {
