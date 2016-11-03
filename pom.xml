@@ -20,7 +20,7 @@
     <parent>
         <artifactId>yggdrasil</artifactId>
         <groupId>io.squark</groupId>
-        <version>0.0.3-ALPHA-SNAPSHOT</version>
+        <version>0.0.3-ALPHA</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
