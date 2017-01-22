@@ -93,7 +93,7 @@ class Module extends ClassLoader {
                 } else {
                     spec = url.getProtocol() + ":" + url.getPath();
                 }
-                URL contentUrl = new URL(null, "jar:" + spec + "!/" + jarEntry.getName(), new NestedJarURLStreamHandler());
+                URL contentUrl = new URL(null, "jar:" + spec + "!/" + jarEntry.getName(), new NestedJarURLStreamHandler(false));
                 resources.put(jarEntry.getName(), contentUrl);
                 addClassIfClass(jarInputStream, jarEntry.getName());
                 logger.trace("Added resource " + jarEntry.getName() + " to ClassLoader");

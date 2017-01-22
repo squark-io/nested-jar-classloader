@@ -37,15 +37,19 @@ import sun.net.www.ParseUtil;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 
 public class NestedJarURLConnection extends URLConnection implements AutoCloseable {
 
+    private final boolean isDirectory;
     private URL jarFileURL;
     private String entryName;
     private boolean connected;
@@ -60,8 +64,9 @@ public class NestedJarURLConnection extends URLConnection implements AutoCloseab
      *
      * @param url the specified URL.
      */
-    public NestedJarURLConnection(URL url, boolean connect) throws IOException {
+    public NestedJarURLConnection(URL url, boolean connect, boolean isDirectory) throws IOException {
         super(url);
+        this.isDirectory = isDirectory;
         parseSpecs(url);
         if (connect) {
             connect();
@@ -120,12 +125,29 @@ public class NestedJarURLConnection extends URLConnection implements AutoCloseab
                 while ((subEntry = entryInputStream.getNextJarEntry()) != null) {
                     if (subEntry.getName().equals(subEntryName)) {
                         subEntryOutputStream =
-                            new FileBackedOutputStream((int) Runtime.getRuntime().freeMemory() / 2, true);
-                        b = new byte[2048];
-                        while ((len = entryInputStream.read(b)) > 0) {
-                            subEntryOutputStream.write(b, 0, len);
+                          new FileBackedOutputStream((int) Runtime.getRuntime().freeMemory() / 2, true);
+                        if (subEntry.isDirectory()) {
+                            JarInputStream newEntryInputStream =
+                              new JarInputStream(entryOutputStream.asByteSource().openBufferedStream());
+                            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(subEntryOutputStream);
+                            JarEntry file;
+                            while ((file = newEntryInputStream.getNextJarEntry()) != null) {
+                                if (file.getName().startsWith(subEntryName)) {
+                                    Path path;
+                                    if ((path = Paths.get(file.getName())).getNameCount() - Paths.get(subEntryName).getNameCount() == 1) {
+                                        outputStreamWriter.append(path.getFileName().toString()).append('\n');
+                                    }
+                                }
+                            }
+                            outputStreamWriter.close();
+                            newEntryInputStream.close();
+                        } else {
+                            b = new byte[2048];
+                            while ((len = entryInputStream.read(b)) > 0) {
+                                subEntryOutputStream.write(b, 0, len);
+                            }
+                            break;
                         }
-                        break;
                     }
                 }
                 entryInputStream.close();

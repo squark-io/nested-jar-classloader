@@ -39,11 +39,16 @@ import java.net.URLStreamHandler;
 public class NestedJarURLStreamHandler extends URLStreamHandler {
 
     private NestedJarURLConnection nestedJarURLConnection;
+    private boolean isDirectory = false;
+
+    public NestedJarURLStreamHandler(boolean isDirectory) {
+        this.isDirectory = isDirectory;
+    }
 
     @Override
     protected URLConnection openConnection(URL url) throws IOException {
         if (nestedJarURLConnection == null) {
-            nestedJarURLConnection = new NestedJarURLConnection(url, true);
+            nestedJarURLConnection = new NestedJarURLConnection(url, true, isDirectory);
         }
         return nestedJarURLConnection;
     }
