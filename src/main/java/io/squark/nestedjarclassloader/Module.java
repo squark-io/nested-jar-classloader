@@ -81,9 +81,6 @@ class Module extends ClassLoader {
             JarEntry jarEntry;
 
             while ((jarEntry = jarInputStream.getNextJarEntry()) != null) {
-                if (jarEntry.isDirectory()) {
-                    continue;
-                }
                 if (resources.containsKey(jarEntry.getName())) {
                     logger.trace(
                             "Already have resource " + jarEntry.getName() + ". If different versions, unexpected behaviour " +
