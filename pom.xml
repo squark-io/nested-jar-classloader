@@ -19,7 +19,7 @@
 
     <groupId>io.squark</groupId>
     <artifactId>nested-jar-classloader</artifactId>
-    <version>0.1.10</version>
+    <version>0.1.11-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Nested Jar Classloader</name>
@@ -221,7 +221,7 @@
     <scm>
         <url>https://github.com/squark-io/nested-jar-classloader</url>
         <connection>scm:git:git@github.com:squark-io/nested-jar-classloader.git</connection>
-      <tag>nested-jar-classloader-0.1.10</tag>
+      <tag>HEAD</tag>
   </scm>
 
 </project>
