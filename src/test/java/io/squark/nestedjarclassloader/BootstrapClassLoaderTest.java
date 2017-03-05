@@ -23,7 +23,7 @@ import java.io.File;
 import java.net.URL;
 
 /**
- * yggdrasil
+ * Nested JAR Classloader
  * <p>
  * Created by Erik Håkansson on 2016-11-01.
  * Copyright 2016

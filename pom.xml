@@ -28,7 +28,7 @@
         Classloader that handles "jar-in-jar" nested jars as well as module loading/unloading
     </description>
 
-    <url>http://yggdrasil.squark.io/nested-jar-classloader</url>
+    <url>http://squark.io/</url>
     <inceptionYear>2016</inceptionYear>
 
     <organization>
