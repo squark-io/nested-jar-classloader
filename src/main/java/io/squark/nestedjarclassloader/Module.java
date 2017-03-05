@@ -31,10 +31,10 @@
  */
 package io.squark.nestedjarclassloader;
 
-import io.squark.yggdrasil.logging.api.InternalLoggerBinder;
 import org.apache.commons.collections4.MultiMapUtils;
 import org.apache.commons.collections4.SetValuedMap;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -58,7 +58,7 @@ class Module extends ClassLoader {
     private final SetValuedMap<String, URL> resources = MultiMapUtils.newSetValuedHashMap();
     private final Map<String, byte[]> byteCache = new HashMap<>();
     private final Map<String, Class<?>> classes = new HashMap<>();
-    private Logger logger = InternalLoggerBinder.getLogger(Module.class);
+    private Logger logger = LoggerFactory.getLogger(Module.class.getName());
     private String name;
 
     Module(String name, NestedJarClassLoader parent) throws IOException {
