@@ -28,6 +28,45 @@
         Classloader that handles "jar-in-jar" nested jars as well as module loading/unloading
     </description>
 
+    <url>http://yggdrasil.squark.io/nested-jar-classloader</url>
+    <inceptionYear>2016</inceptionYear>
+
+    <organization>
+        <name>squark.io</name>
+        <url>http://squark.io</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+            <comments>A business-friendly OSS license</comments>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Erik Håkansson</name>
+            <email>erik@squark.com</email>
+        </developer>
+    </developers>
+
+    <contributors>
+        <contributor>
+            <name>Erik Håkansson</name>
+            <email>erik@squark.com</email>
+        </contributor>
+    </contributors>
+
+    <distributionManagement>
+        <repository>
+            <id>bintray-squark-io-squark.io</id>
+            <name>squark-io-squark.io</name>
+            <url>https://api.bintray.com/maven/squark-io/squark.io/nested-jar-classloader/;publish=1</url>
+        </repository>
+    </distributionManagement>
+
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
