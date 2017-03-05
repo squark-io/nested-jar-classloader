@@ -32,6 +32,7 @@
 package io.squark.nestedjarclassloader;
 
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.net.URL;
@@ -47,11 +48,13 @@ public class NestedJarClassLoader extends ClassLoader {
 
     private static final String DEFAULT_MODULE_NAME = "default";
     private final Map<String, Module> modules = new LinkedHashMap<>();
+    private Logger logger;
 
-    public NestedJarClassLoader(@Nullable ClassLoader parent)
+    public NestedJarClassLoader(@Nullable ClassLoader parent, @Nullable Logger logger)
     {
         super(parent);
         Thread.currentThread().setContextClassLoader(this);
+        this.logger = logger;
     }
 
     public void addURLs(URL... urls) throws IOException {
@@ -79,7 +82,7 @@ public class NestedJarClassLoader extends ClassLoader {
     private Module getModule(String moduleName) throws IOException {
         Module module = modules.get(moduleName);
         if (module == null) {
-            module = new Module(moduleName, this);
+            module = new Module(moduleName, this, logger);
             modules.put(moduleName, module);
         }
         return module;

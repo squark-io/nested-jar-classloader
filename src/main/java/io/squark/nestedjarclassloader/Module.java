@@ -33,8 +33,8 @@ package io.squark.nestedjarclassloader;
 
 import org.apache.commons.collections4.MultiMapUtils;
 import org.apache.commons.collections4.SetValuedMap;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -58,12 +58,13 @@ class Module extends ClassLoader {
     private final SetValuedMap<String, URL> resources = MultiMapUtils.newSetValuedHashMap();
     private final Map<String, byte[]> byteCache = new HashMap<>();
     private final Map<String, Class<?>> classes = new HashMap<>();
-    private Logger logger = LoggerFactory.getLogger(Module.class.getName());
+    private Logger logger;
     private String name;
 
-    Module(String name, NestedJarClassLoader parent) throws IOException {
+    Module(String name, NestedJarClassLoader parent, @Nullable Logger logger) throws IOException {
         super(parent);
         this.name = name;
+        this.logger = logger;
     }
 
     public void addResources(URL... urls) throws IOException {
@@ -74,7 +75,7 @@ class Module extends ClassLoader {
 
     private void addResource0(URL url) throws IOException {
         if (url.getPath().endsWith(".jar")) {
-            logger.debug("Adding jar " + url.getPath());
+            if (logger != null) logger.debug("Adding jar " + url.getPath());
             InputStream urlStream = url.openStream();
             BufferedInputStream bufferedInputStream = new BufferedInputStream(urlStream);
             JarInputStream jarInputStream = new JarInputStream(bufferedInputStream);
@@ -82,7 +83,7 @@ class Module extends ClassLoader {
 
             while ((jarEntry = jarInputStream.getNextJarEntry()) != null) {
                 if (resources.containsKey(jarEntry.getName())) {
-                    logger.trace(
+                    if (logger != null) logger.trace(
                             "Already have resource " + jarEntry.getName() + ". If different versions, unexpected behaviour " +
                                     "might occur. Available in " + resources.get(jarEntry.getName()));
                 }
@@ -96,7 +97,7 @@ class Module extends ClassLoader {
                 URL contentUrl = new URL(null, "jar:" + spec + "!/" + jarEntry.getName(), new NestedJarURLStreamHandler(false));
                 resources.put(jarEntry.getName(), contentUrl);
                 addClassIfClass(jarInputStream, jarEntry.getName());
-                logger.trace("Added resource " + jarEntry.getName() + " to ClassLoader");
+                if (logger != null) logger.trace("Added resource " + jarEntry.getName() + " to ClassLoader");
                 if (jarEntry.getName().endsWith(".jar")) {
                     addResource0(contentUrl);
                 }
